@@ -1,7 +1,13 @@
+package main
+
 import (
-  "fmt"
+	"fmt"
 )
 
+func Add(a int, b int) int {
+	return a + b
+}
+
 func main() {
-  fmt.Println("what's up")
+	fmt.Println("what's up")
 }
