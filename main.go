@@ -52,22 +52,22 @@ func (c Delete) ExecuteCommand(state State) (string, error) {
 func ParseCommand(line string) (Command, error) {
 	tokens := strings.Split(line, " ")
 
-	switch tokens[0] {
-	case "READ":
+	switch strings.ToLower(tokens[0]) {
+	case "read":
 		if len(tokens) != 2 {
 			return nil, errors.New("READ must have a key")
 		}
 
 		key := tokens[1]
 		return Read{key}, nil
-	case "WRITE":
+	case "write":
 		if len(tokens) != 3 {
 			return nil, errors.New("WRITE must have a key and value")
 		}
 		key := tokens[1]
 		val := tokens[2]
 		return Write{key, val}, nil
-	case "DELETE":
+	case "delete":
 		if len(tokens) != 2 {
 			return nil, errors.New("DELETE must have a key")
 		}
@@ -84,19 +84,25 @@ func main() {
 	state := State{Data: map[string]string{}}
 
 	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
+	for {
+		fmt.Printf("> ")
+
+		if !scanner.Scan() {
+			break
+		}
+
 		line := scanner.Text()
 		command, err := ParseCommand(line)
 
 		if err != nil {
-			fmt.Errorf("Bad command %s because %s", line, err)
+			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 			continue
 		}
 
 		message, err := command.ExecuteCommand(state)
 
 		if err != nil {
-			fmt.Errorf("Unable to execute command %v because %s", command, err)
+			fmt.Fprintf(os.Stderr, "Unable to execute command %v because %s\n", command, err)
 			continue
 		}
 
